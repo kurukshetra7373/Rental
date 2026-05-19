@@ -10,17 +10,9 @@ const App: React.FC = () => {
   const { state, setRole, backendStatus } = useApp();
   const { currentUser, logout } = useAuth();
 
-  // Sync app role to logged-in user's role
-  useEffect(() => {
-    if (currentUser) setRole(currentUser.role);
-  }, [currentUser]);
-
-  if (!currentUser) return <LoginPage />;
   const [isMobile, setIsMobile] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [guideTab, setGuideTab] = useState<'overview' | 'script' | 'checklist'>('overview');
-
-  // Interactive checklist states stored locally
   const [checks, setChecks] = useState({
     syndicate: false,
     apply: false,
@@ -28,6 +20,13 @@ const App: React.FC = () => {
     esign: false,
     tax: false,
   });
+
+  // Sync app role to logged-in user's role
+  useEffect(() => {
+    if (currentUser) setRole(currentUser.role);
+  }, [currentUser]);
+
+  if (!currentUser) return <LoginPage />;
 
   const toggleCheck = (key: keyof typeof checks) => {
     setChecks(prev => ({ ...prev, [key]: !prev[key] }));

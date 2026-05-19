@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import type { ConfirmationResult } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { auth, firebaseReady } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 
 type Step = 'details' | 'otp';
@@ -47,8 +47,11 @@ const LoginPage: React.FC = () => {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [countdown]);
 
+  // --- simulation fallback (used when Firebase keys are not configured) ---
+  const [simOtp, setSimOtp] = useState('');
+
   const setupRecaptcha = () => {
-    if (!recaptchaRef.current) {
+    if (!recaptchaRef.current && auth) {
       recaptchaRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
         size: 'invisible',
         callback: () => {},
@@ -62,16 +65,24 @@ const LoginPage: React.FC = () => {
     setError('');
     setSending(true);
 
+    if (!firebaseReady) {
+      // Simulation mode — generate OTP locally
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      setSimOtp(code);
+      setTimeout(() => { setSending(false); setStep('otp'); setCountdown(30); }, 1000);
+      return;
+    }
+
     try {
       setupRecaptcha();
       const e164 = '+1' + phone.replace(/\D/g, '');
-      const result = await signInWithPhoneNumber(auth, e164, recaptchaRef.current!);
+      const result = await signInWithPhoneNumber(auth!, e164, recaptchaRef.current!);
       confirmationRef.current = result;
       setStep('otp');
       setCountdown(30);
     } catch (err: any) {
       setError(getFriendlyError(err.code));
-      recaptchaRef.current = null; // reset so it can be recreated
+      recaptchaRef.current = null;
     } finally {
       setSending(false);
     }
@@ -79,18 +90,26 @@ const LoginPage: React.FC = () => {
 
   const handleVerifyOtp = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (!confirmationRef.current || otp.length < 6) return;
     setError('');
     setVerifying(true);
 
+    if (!firebaseReady) {
+      // Simulation mode — compare locally
+      setTimeout(() => {
+        if (otp === simOtp) {
+          login({ id: `user_${Date.now()}`, name: name.trim(), phone, role });
+        } else {
+          setError('Incorrect OTP. Please try again.');
+          setVerifying(false);
+        }
+      }, 800);
+      return;
+    }
+
+    if (!confirmationRef.current || otp.length < 6) return;
     try {
       await confirmationRef.current.confirm(otp);
-      login({
-        id:    `user_${Date.now()}`,
-        name:  name.trim(),
-        phone: phone,
-        role,
-      });
+      login({ id: `user_${Date.now()}`, name: name.trim(), phone, role });
     } catch (err: any) {
       setError(getFriendlyError(err.code));
       setVerifying(false);
@@ -101,11 +120,19 @@ const LoginPage: React.FC = () => {
     if (countdown > 0) return;
     setError('');
     setSending(true);
+
+    if (!firebaseReady) {
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      setSimOtp(code);
+      setTimeout(() => { setSending(false); setCountdown(30); setOtp(''); }, 800);
+      return;
+    }
+
     try {
       recaptchaRef.current = null;
       setupRecaptcha();
       const e164 = '+1' + phone.replace(/\D/g, '');
-      const result = await signInWithPhoneNumber(auth, e164, recaptchaRef.current!);
+      const result = await signInWithPhoneNumber(auth!, e164, recaptchaRef.current!);
       confirmationRef.current = result;
       setCountdown(30);
       setOtp('');
@@ -271,22 +298,41 @@ const LoginPage: React.FC = () => {
                 </p>
               </div>
 
-              {/* SMS sent confirmation */}
-              <div style={{
-                background: 'rgba(16,185,129,0.08)',
-                border: '1px solid rgba(16,185,129,0.3)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '0.85rem 1rem',
-                display: 'flex', alignItems: 'center', gap: '10px'
-              }}>
-                <span style={{ fontSize: '1.4rem' }}>📨</span>
-                <div>
-                  <p style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--accent-emerald)', margin: 0 }}>SMS Sent Successfully</p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0, marginTop: '2px' }}>
-                    Check your messages. OTP expires in 10 minutes.
+              {/* SMS sent / simulation box */}
+              {firebaseReady ? (
+                <div style={{
+                  background: 'rgba(16,185,129,0.08)',
+                  border: '1px solid rgba(16,185,129,0.3)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.85rem 1rem',
+                  display: 'flex', alignItems: 'center', gap: '10px'
+                }}>
+                  <span style={{ fontSize: '1.4rem' }}>📨</span>
+                  <div>
+                    <p style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--accent-emerald)', margin: 0 }}>SMS Sent Successfully</p>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0, marginTop: '2px' }}>
+                      Check your messages. OTP expires in 10 minutes.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div style={{
+                  background: 'rgba(124,58,237,0.08)',
+                  border: '1px solid rgba(124,58,237,0.3)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.85rem 1rem',
+                }}>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--accent-violet)', fontWeight: '600', margin: '0 0 4px 0' }}>
+                    📱 Simulated SMS — Firebase not configured
+                  </p>
+                  <p style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '0.3em', color: 'white', margin: 0, fontFamily: 'monospace' }}>
+                    {simOtp}
+                  </p>
+                  <p style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)', margin: '4px 0 0 0' }}>
+                    Add Firebase keys to .env.local to send real SMS
                   </p>
                 </div>
-              </div>
+              )}
 
               <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div>
