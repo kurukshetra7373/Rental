@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from './context/AppContext';
+import { useAuth } from './context/AuthContext';
 import LandlordView from './components/LandlordView';
 import TenantView from './components/TenantView';
 import VendorView from './components/VendorView';
+import LoginPage from './components/LoginPage';
 
 const App: React.FC = () => {
   const { state, setRole, backendStatus } = useApp();
+  const { currentUser, logout } = useAuth();
+
+  // Sync app role to logged-in user's role
+  useEffect(() => {
+    if (currentUser) setRole(currentUser.role);
+  }, [currentUser]);
+
+  if (!currentUser) return <LoginPage />;
   const [isMobile, setIsMobile] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [guideTab, setGuideTab] = useState<'overview' | 'script' | 'checklist'>('overview');
@@ -107,33 +117,33 @@ const App: React.FC = () => {
             {isMobile ? '🖥️ Desktop View' : '📱 Mobile App View'}
           </button>
 
-          <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--bg-dark)', padding: '4px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-glass)' }}>
-            {(['landlord', 'tenant', 'vendor'] as const).map(r => (
-              <button
-                key={r}
-                onClick={() => setRole(r)}
-                style={{
-                  background: state.currentRole === r ? 'var(--accent-violet)' : 'transparent',
-                  color: state.currentRole === r ? 'white' : 'var(--text-secondary)',
-                  border: 'none',
-                  padding: '0.4rem 1rem',
-                  borderRadius: '4px',
-                  textTransform: 'capitalize',
-                  fontSize: '0.85rem',
-                  cursor: 'pointer'
-                }}
-              >
-                {r}
-              </button>
-            ))}
+          {/* Logged-in user badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-dark)', padding: '6px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-glass)' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-violet), var(--accent-emerald))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 'bold', color: 'white' }}>
+              {currentUser.name.charAt(0).toUpperCase()}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'white', lineHeight: 1.2 }}>{currentUser.name}</span>
+              <span style={{ fontSize: '0.65rem', color: 'var(--accent-violet)', textTransform: 'capitalize' }}>{currentUser.role}</span>
+            </div>
           </div>
-          <div style={{ 
-            width: '36px', height: '36px', borderRadius: '50%', 
-            background: 'var(--border-glass)', display: 'flex', 
-            alignItems: 'center', justifyContent: 'center', cursor: 'pointer' 
-          }}>
-            👤
-          </div>
+
+          {/* Logout */}
+          <button
+            onClick={logout}
+            style={{
+              background: 'rgba(239, 68, 68, 0.1)',
+              color: '#f87171',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              padding: '0.4rem 0.85rem',
+              borderRadius: '4px',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+              fontWeight: '600'
+            }}
+          >
+            Sign Out
+          </button>
         </div>
       </header>
 
