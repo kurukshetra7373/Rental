@@ -110,11 +110,7 @@ const LandlordAccounting: React.FC<AccountingProps> = ({ state, addLedgerEntry, 
   const [efileStatus, setEfileStatus] = useState<'idle' | 'filing' | 'completed'>('idle');
 
   // Sample Mock Bank Feed
-  const [bankFeed, setBankFeed] = useState([
-    { id: 'bf1', date: '2026-05-18', name: 'DEPOSIT ACH - ALICE JOHNSON', amount: 1800, matched: false, ledgerId: '' },
-    { id: 'bf2', date: '2026-05-17', name: 'ACH DEBIT - FIXIT PLUMBING CO', amount: -250, matched: false, ledgerId: '' },
-    { id: 'bf3', date: '2026-05-16', name: 'DEPOSIT WIRE - DOWNTOWN LOFTS', amount: 3000, matched: false, ledgerId: '' },
-  ]);
+  const [bankFeed, setBankFeed] = useState<{ id: string; date: string; name: string; amount: number; matched: boolean; ledgerId: string }[]>([]);
 
   // Automated County Tax States
   const [selectedTaxProp, setSelectedTaxProp] = useState<string>('p1');

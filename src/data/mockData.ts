@@ -2,36 +2,10 @@ import type { AppState } from '../types';
 
 export const initialMockData: AppState = {
   currentRole: 'landlord',
-  properties: [
-    { id: 'p1', name: 'Sunset Apartments', address: '123 Sunset Blvd, CA', units: 24, occupancyRate: 95, monthlyRevenue: 45000 },
-    { id: 'p2', name: 'Oakwood Residences', address: '456 Oak St, TX', units: 12, occupancyRate: 100, monthlyRevenue: 18000 },
-    { id: 'p3', name: 'Downtown Lofts', address: '789 Main St, NY', units: 8, occupancyRate: 87, monthlyRevenue: 24000 },
-    { id: 'p4', name: 'Riverfront Townhomes', address: '101 River Rd, IL', units: 5, occupancyRate: 80, monthlyRevenue: 12500 },
-    { id: 'p5', name: 'Palm View Estates', address: '202 Palm Ave, FL', units: 15, occupancyRate: 93, monthlyRevenue: 30000 },
-  ],
-  tenants: [
-    { id: 't1', name: 'Alice Johnson', email: 'alice.j@example.com', phone: '(555) 123-4567', propertyId: 'p1', unitNo: '101', rentAmount: 1800, balance: 0, autopayStatus: true, leaseStart: '2025-01-01', leaseEnd: '2025-12-31', status: 'active' },
-    { id: 't2', name: 'Michael Smith', email: 'mike.s@example.com', phone: '(555) 234-5678', propertyId: 'p1', unitNo: '102', rentAmount: 1850, balance: 1850, autopayStatus: false, leaseStart: '2024-06-01', leaseEnd: '2025-05-31', status: 'delinquent' },
-    { id: 't3', name: 'Sarah Williams', email: 'sarah.w@example.com', phone: '(555) 345-6789', propertyId: 'p2', unitNo: 'A1', rentAmount: 1500, balance: 0, autopayStatus: true, leaseStart: '2025-03-01', leaseEnd: '2026-02-28', status: 'active' },
-    { id: 't4', name: 'David Brown', email: 'david.b@example.com', phone: '(555) 456-7890', propertyId: 'p3', unitNo: '3B', rentAmount: 3000, balance: 0, autopayStatus: false, leaseStart: '2025-02-01', leaseEnd: '2026-01-31', status: 'active' },
-    { id: 't5', name: 'Emily Davis', email: 'emily.d@example.com', phone: '(555) 567-8901', propertyId: 'p4', unitNo: 'Townhome 2', rentAmount: 2500, balance: 5000, autopayStatus: false, leaseStart: '2024-10-01', leaseEnd: '2025-09-30', status: 'notice' },
-  ],
-  vendors: [
-    { id: 'v1', name: 'FixIt Plumbing', specialty: 'Plumbing', email: 'jobs@fixitplumbing.com', phone: '(555) 999-1111', activeJobs: 2 },
-    { id: 'v2', name: 'Volt Electricians', specialty: 'Electrical', email: 'service@voltelectric.com', phone: '(555) 999-2222', activeJobs: 1 },
-    { id: 'v3', name: 'All-Around Handyman', specialty: 'General', email: 'hello@allaround.com', phone: '(555) 999-3333', activeJobs: 0 },
-  ],
-  tickets: [
-    { id: 'tk1', title: 'Leaking Faucet in Kitchen', description: 'The kitchen sink faucet is dripping constantly.', propertyId: 'p1', tenantId: 't1', status: 'open', priority: 'low', createdAt: new Date().toISOString(), logs: [] },
-    { id: 'tk2', title: 'No Hot Water', description: 'Water heater seems broken, completely cold water.', propertyId: 'p3', tenantId: 't4', vendorId: 'v1', status: 'assigned', priority: 'emergency', createdAt: new Date(Date.now() - 86400000).toISOString(), logs: [{ id: 'l1', timestamp: new Date(Date.now() - 80000000).toISOString(), message: 'Assigned to FixIt Plumbing.', authorId: 'admin', authorRole: 'landlord' }] },
-  ],
-  ledger: [
-    { id: 'tr1', date: '2026-05-01', propertyId: 'p1', amount: 1800, type: 'income', category: 'Rent', description: 'Rent Payment - Alice Johnson', status: 'pending' },
-    { id: 'tr2', date: '2026-05-02', propertyId: 'p2', amount: 1500, type: 'income', category: 'Rent', description: 'Rent Payment - Sarah Williams', status: 'cleared' },
-    { id: 'tr3', date: '2026-05-10', propertyId: 'p1', amount: -250, type: 'expense', category: 'Maintenance', description: 'HVAC Filter Replacements', status: 'pending' },
-    { id: 'tr4', date: '2026-05-15', propertyId: 'p3', amount: 3000, type: 'income', category: 'Rent', description: 'Rent Payment - David Brown', status: 'pending' },
-  ],
-  owners: [
-    { id: 'o1', name: 'John Doe', sharePercent: 100, totalDraws: 85000 }
-  ]
+  properties: [],
+  tenants: [],
+  vendors: [],
+  tickets: [],
+  ledger: [],
+  owners: []
 };

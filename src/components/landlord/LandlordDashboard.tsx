@@ -24,12 +24,7 @@ interface DashboardProps {
 }
 
 const LandlordDashboard: React.FC<DashboardProps> = ({ state }) => {
-  const [tasks, setTasks] = useState([
-    { id: 1, text: 'Review FixIt Plumbing bill for Unit 102', done: false, priority: 'high' },
-    { id: 2, text: 'Apply late fee rule to delinquent tenants', done: false, priority: 'medium' },
-    { id: 3, text: 'Conduct quarterly inspection for Riverfront Townhomes', done: false, priority: 'low' },
-    { id: 4, text: 'Approve e-lease draft for Alice Johnson', done: true, priority: 'low' },
-  ]);
+  const [tasks, setTasks] = useState<{ id: number; text: string; done: boolean; priority: string }[]>([]);
 
   const toggleTask = (id: number) => {
     setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));

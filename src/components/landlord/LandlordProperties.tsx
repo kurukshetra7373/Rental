@@ -56,10 +56,7 @@ const LandlordProperties: React.FC<PropertiesProps> = ({ state, addProperty, add
   // Syndication Status
   const [syndicateStatus, setSyndicateStatus] = useState<'idle' | 'syndicating' | 'active'>('idle');
   const [activeChannels, setActiveChannels] = useState<string[]>([]);
-  const [inboundLeads, setInboundLeads] = useState<any[]>([
-    { id: 'lead1', name: 'Liam Carter', source: 'Zillow', email: 'liam.c@zillow.com', phone: '(555) 777-1234', credit: 742, evictions: 0 },
-    { id: 'lead2', name: 'Chloe Sterling', source: 'Apartments.com', email: 'chloe.s@apts.com', phone: '(555) 888-5678', credit: 690, evictions: 0 }
-  ]);
+  const [inboundLeads, setInboundLeads] = useState<any[]>([]);
 
   // Screening States
   const [screeningTenant, setScreeningTenant] = useState<string>('');
